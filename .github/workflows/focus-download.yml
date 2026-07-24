@@ -1,0 +1,45 @@
+name: Focus Download
+
+on:
+  # Toda segunda às 9h15 BRT (12h15 UTC)
+  schedule:
+    - cron: "15 12 * * 1"
+  # Disparo manual
+  workflow_dispatch:
+
+# Necessário para o job commitar os arquivos baixados de volta ao repo
+permissions:
+  contents: write
+
+jobs:
+  baixar-e-extrair:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependências
+        run: python -m pip install -r requirements.txt
+
+      - name: Baixar o PDF do Focus
+        run: python src/baixar_focus.py
+
+      - name: Extrair o texto
+        run: python src/extrair_texto.py
+
+      - name: Commitar os arquivos baixados
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/focus_*.pdf data/focus_*.txt
+          if git diff --cached --quiet; then
+            echo "Nada novo para commitar."
+          else
+            git commit -m "Focus: download automático $(date -u +%Y-%m-%d)"
+            git push
+          fi

@@ -1,0 +1,12 @@
+# Artefatos Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Ambiente virtual
+.venv/
+
+# Variáveis de ambiente / segredos
+.env
+
+# Observação: output/focus/ é versionado DE PROPÓSITO (guarda os resumos).
